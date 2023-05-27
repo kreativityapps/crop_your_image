@@ -325,11 +325,6 @@ class _CropEditorState extends State<_CropEditor> {
         _resizeWith(_aspectRatio, newArea);
       };
 
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
     final future = compute(_fromByteData, widget.image);
     _lastComputed = future;
     future.then((converted) {
@@ -338,13 +333,15 @@ class _CropEditorState extends State<_CropEditor> {
         _withCircleUi = widget.withCircleUi;
         _resetCroppingArea();
 
+        if (!mounted) return;
         setState(() {
           _lastComputed = null;
         });
         widget.onStatusChanged?.call(CropStatus.ready);
       }
     });
-    super.didChangeDependencies();
+
+    super.initState();
   }
 
   /// reset image to be cropped
@@ -366,6 +363,7 @@ class _CropEditorState extends State<_CropEditor> {
 
   /// reset [Rect] of cropping area with current state
   void _resetCroppingArea() {
+    if (!mounted) return;
     final screenSize = MediaQuery.of(context).size;
 
     final imageRatio = _targetImage!.width / _targetImage!.height;
